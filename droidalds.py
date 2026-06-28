@@ -2,13 +2,14 @@ import discord
 import asyncio
 import feedparser
 import os
+import aiohttp
 
 TOKEN = "TOKEN"
 CHANNEL_ID = ID
 RSS_URLS = [
     "https://lwn.net/headlines/rss",
     "https://www.phoronix.com/rss.php",
-    "https://linux.org/forums/linux-news.52/index.rss",
+    "https://www.linux.org/forums/linux-news.206/index.rss?order=post_date",
     "https://archlinux.org/feeds/news/",
     "https://www.gentoo.org/feeds/news.xml",
     "https://voidlinux.org/atom.xml",
@@ -35,6 +36,25 @@ class NewsBot(discord.Client):
         with open(SENT_FILE, "a") as f:
             f.write(link + "\n")
 
+    async def fetch_feed(self, url):
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
+        }
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.get(url, timeout=10, headers=headers) as response:
+                    if response.status != 200:
+                        print(f"Ошибка {url}: статус {response.status}")
+                        return None
+                    text = await response.text()
+                    if not text.strip():
+                        print(f"Пустой ответ от {url}")
+                        return None
+                    return feedparser.parse(text)
+            except Exception as e:
+                print(f"Ошибка загрузки {url}: {e}")
+                return None
+
     async def on_ready(self):
         print(f"Бот {self.user} запущен")
         self.loop.create_task(self.check_news())
@@ -44,7 +64,9 @@ class NewsBot(discord.Client):
         while not self.is_closed():
             try:
                 for url in RSS_URLS:
-                    feed = feedparser.parse(url)
+                    feed = await self.fetch_feed(url)
+                    if feed is None or not feed.entries:
+                        continue
                     for entry in feed.entries[:5]:
                         if entry.link not in self.seen:
                             self.seen.add(entry.link)
