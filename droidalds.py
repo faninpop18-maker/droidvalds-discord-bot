@@ -11,7 +11,8 @@ RSS_URLS = [
     "https://linux.org/forums/linux-news.52/index.rss",
     "https://archlinux.org/feeds/news/",
     "https://www.gentoo.org/feeds/news.xml",
-    "https://voidlinux.org/atom.xml"
+    "https://voidlinux.org/atom.xml",
+    "https://micronews.debian.org/feeds/feed.rss"
 ]
 CHECK_INTERVAL = 300
 SENT_FILE = "sent_links.txt"
