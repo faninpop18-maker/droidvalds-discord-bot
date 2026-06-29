@@ -7,16 +7,15 @@ import aiohttp
 TOKEN = "TOKEN"
 CHANNEL_ID = ID
 RSS_URLS = [
-    "https://lwn.net/headlines/rss",
     "https://www.phoronix.com/rss.php",
-    "https://www.linux.org/forums/linux-news.206/index.rss?order=post_date",
     "https://archlinux.org/feeds/news/",
     "https://www.gentoo.org/feeds/news.xml",
-    "https://voidlinux.org/atom.xml",
+    "https://distrowatch.com/news/dw.xml",
     "https://micronews.debian.org/feeds/feed.rss",
     "https://blog.linuxmint.com/?feed=rss2",
     "https://news.opensuse.org/category/announcements/feed/",
-    "https://fedoramagazine.org/feed/"
+    "https://fedoramagazine.org/feed/",
+    "https://forum.endeavouros.com/c/important-notifications/125.rss"
 ]
 CHECK_INTERVAL = 300
 SENT_FILE = "sent_links.txt"
@@ -38,7 +37,12 @@ class NewsBot(discord.Client):
 
     async def fetch_feed(self, url):
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36",
+            "Accept": "application/rss+xml, application/xml, text/xml; q=0.9, */*; q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Accept-Encoding": "gzip, deflate",
+            "Connection": "keep-alive",
+            "Cache-Control": "no-cache",
         }
         async with aiohttp.ClientSession() as session:
             try:
